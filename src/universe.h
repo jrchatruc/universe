@@ -23,6 +23,7 @@ namespace Universe
 		void update_velocity(const double delta_t);
 		Vector2 gravitational_force(CelestialBody &other);
 		void update_acceleration(std::vector<CelestialBody> &solar_system);
+		// TODO: Get rid of constructors in general?
 		CelestialBody()
 		{
 		}

@@ -1,10 +1,8 @@
-#include "universe.h"
-
 #include <math.h>
 #include <stdio.h>
-
 #include <vector>
 
+#include "universe.h"
 #include "linalg.h"
 
 using LinAlg::Vector2;

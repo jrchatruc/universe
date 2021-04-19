@@ -7,13 +7,20 @@
 #include "universe.h"
 #include "linalg.h"
 
+using LinAlg::Matrix3;
 using LinAlg::Vector2;
+using LinAlg::Vector3;
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
 const int BLOCK_WIDTH = 16;
 const int BLOCK_HEIGHT = 16;
 
+auto camera = Vector3(-2, -2, -2);
+auto current_basis = LinAlg::Basis{Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1)};
+
+// TODO: Move everything to 3D, render planets as spheres
+// TODO: Allow camera rotation. Start by allowing 90 degree rotations
 // TODO: User can pause the simulation and enter commands into the terminal to add/remove planets and then resume.
 // TODO: The result of the simulation seems to be tied to the window's height and width; figure out why and fix it.
 // TODO: Replace std::vector with a custom bump allocator to allocate at most 1_000 planets or something.
@@ -23,6 +30,9 @@ void close();
 void draw_system(std::vector<Universe::CelestialBody> &solar_system);
 void draw_body(Universe::CelestialBody &body);
 std::vector<Universe::CelestialBody> create_solar_system();
+void render_mesh(std::vector<std::pair<Vector3, Vector3>> edges, int scaler, Vector2 translator);
+void draw_cube();
+void draw_sphere(int N, int M);
 
 SDL_Window *gWindow = NULL;
 SDL_Renderer *gRenderer = NULL;
@@ -40,6 +50,7 @@ int main(int argc, char *args[])
 		bool quit = false;
 		bool paused = false;
 		std::vector<Universe::CelestialBody> solar_system = create_solar_system();
+		SDL_SetRelativeMouseMode(SDL_TRUE);
 
 		auto now = std::chrono::system_clock::now();
 		while (!quit)
@@ -53,15 +64,108 @@ int main(int argc, char *args[])
 			now = new_now;
 			while (SDL_PollEvent(&e))
 			{
-				if (e.type == SDL_QUIT)
+				switch (e.type)
 				{
+				case SDL_KEYDOWN:
+					switch (e.key.keysym.sym)
+					{
+					case SDLK_LEFT:
+						camera += Vector3(-0.05, 0., 0.);
+						break;
+					case SDLK_RIGHT:
+						camera += Vector3(0.05, 0., 0.);
+						break;
+					case SDLK_UP:
+						camera += Vector3(0., 0.05, 0.);
+						break;
+					case SDLK_DOWN:
+						camera += Vector3(0., -0.05, 0.);
+						break;
+					case SDLK_w:
+					{
+						auto direction = current_basis.v_3;
+						camera += direction * 0.05;
+						break;
+					}
+					case SDLK_s:
+					{
+						auto direction = current_basis.v_3;
+						camera += direction * (-0.05);
+						break;
+					}
+					case SDLK_a:
+					{
+						auto direction = current_basis.v_1;
+						camera += direction * (-0.05);
+						break;
+					}
+					case SDLK_d:
+					{
+						auto direction = current_basis.v_1;
+						camera += direction * 0.05;
+						break;
+					}
+					case SDLK_r:
+					{
+						// X as rotation axis
+						Matrix3 rotation = Matrix3{
+							{{1, 0, 0},
+							 {0, cos(M_PI / 40), -sin(M_PI / 40)},
+							 {0, sin(M_PI / 40), cos(M_PI / 40)}}};
+						current_basis.rotate(rotation);
+						break;
+					}
+					case SDLK_t:
+					{
+						// Y as rotation axis
+						Matrix3 rotation = Matrix3{
+							{{cos(M_PI / 40), 0, -sin(M_PI / 40)},
+							 {0, 1, 0},
+							 {sin(M_PI / 40), 0, cos(M_PI / 40)}}};
+						current_basis.rotate(rotation);
+						break;
+					}
+					case SDLK_y:
+					{
+						// Z as rotation axis
+						Matrix3 rotation = Matrix3{
+							{{cos(M_PI / 40), -sin(M_PI / 40), 0},
+							 {sin(M_PI / 40), cos(M_PI / 40), 0},
+							 {0, 0, 1}}};
+						current_basis.rotate(rotation);
+						break;
+					}
+					default:
+						break;
+					}
+					break;
+				case SDL_MOUSEMOTION:
+				{
+					int xpos = e.motion.xrel;
+					int ypos = e.motion.yrel;
+					// Source for this calculation https://math.stackexchange.com/questions/142821/matrix-for-rotation-around-a-vector
+					if (xpos != 0 && ypos != 0)
+					{
+						auto axis = LinAlg::normalize(Vector3{ypos, xpos, 0});
+						axis.print();
+						auto W = Matrix3{{{0, -axis.z, axis.y},
+										  {axis.z, 0, -axis.x},
+										  {-axis.y, axis.x, 0}}};
+						auto rotation = IDENTITY_MATRIX + W * (sin(M_PI / 40)) + (W * W) * (2 * pow(sin(M_PI / 80), 2));
+						current_basis.rotate(rotation);
+					}
+					break;
+				}
+				case SDL_QUIT:
 					quit = true;
 				}
 			}
 
-			Universe::update_system(solar_system, delta_t);
-			draw_system(solar_system);
+			// Universe::update_system(solar_system, delta_t);
+			// draw_system(solar_system);
 
+			// draw_cube();
+			draw_sphere(20, 20);
 			SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0);
 			SDL_UpdateWindowSurface(gWindow);
 		}
@@ -155,4 +259,98 @@ std::vector<Universe::CelestialBody> create_solar_system()
 	solar_system.push_back(planet_three);
 
 	return solar_system;
+}
+
+void draw_cube()
+{
+
+	auto A = Vector3(1, 1, 1);
+	auto B = Vector3(-1, 1, 1);
+	auto C = Vector3(1, -1, 1);
+	auto D = Vector3(-1, -1, 1);
+	auto E = Vector3(1, 1, -1);
+	auto F = Vector3(-1, 1, -1);
+	auto G = Vector3(1, -1, -1);
+	auto H = Vector3(-1, -1, -1);
+
+	std::vector<std::pair<Vector3, Vector3>> mesh;
+	mesh.push_back(std::make_pair(A, B));
+	mesh.push_back(std::make_pair(C, D));
+	mesh.push_back(std::make_pair(E, F));
+	mesh.push_back(std::make_pair(G, H));
+	mesh.push_back(std::make_pair(A, C));
+	mesh.push_back(std::make_pair(B, D));
+	mesh.push_back(std::make_pair(E, G));
+	mesh.push_back(std::make_pair(F, H));
+	mesh.push_back(std::make_pair(A, E));
+	mesh.push_back(std::make_pair(C, G));
+	mesh.push_back(std::make_pair(B, F));
+	mesh.push_back(std::make_pair(D, H));
+
+	render_mesh(mesh, 200, Vector2(400, 400));
+}
+
+Vector3 sphere_sample_point(int n, int m, int N, int M)
+{
+	return Vector3(sin(M_PI * m / M) * cos(2 * M_PI * n / N), sin(M_PI * m / M) * sin(2 * M_PI * n / N), cos(M_PI * m / M));
+}
+
+// edges correspond to every pair ((m, n), (m', n')) where |m - m'| = 1 xor |n - n'|
+void draw_sphere(int N, int M)
+{
+	std::vector<std::pair<Vector3, Vector3>> mesh;
+	// This mesh is insanely inefficient, a lot (and I do mean A LOT) of edges will be pushed back twice, but w/e.
+	for (int m = 0; m <= M; m++)
+	{
+		for (int n = 0; n <= N; n++)
+		{
+			auto v_1 = sphere_sample_point(n, m, N, M);
+			if (n < N)
+			{
+				auto v_2 = sphere_sample_point(n + 1, m, N, M);
+				mesh.push_back(std::make_pair(v_1, v_2));
+			}
+			if (n > 0)
+			{
+				auto v_2 = sphere_sample_point(n - 1, m, N, M);
+				mesh.push_back(std::make_pair(v_1, v_2));
+			}
+
+			if (m < M)
+			{
+				auto v_2 = sphere_sample_point(n, m + 1, N, M);
+				mesh.push_back(std::make_pair(v_1, v_2));
+			}
+
+			if (m > 0)
+			{
+				auto v_2 = sphere_sample_point(n, m - 1, N, M);
+				mesh.push_back(std::make_pair(v_1, v_2));
+			}
+		}
+	}
+
+	render_mesh(mesh, 200, Vector2(400, 400));
+}
+
+void render_mesh(std::vector<std::pair<Vector3, Vector3>> edges, int scaler, Vector2 translator)
+{
+	SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 0);
+	for (auto &edge : edges)
+	{
+		auto vertex_1 = current_basis.coordinates(edge.first - camera);
+		auto vertex_2 = current_basis.coordinates(edge.second - camera);
+
+		// Only render edge if it's in front of the camera
+		if (vertex_1.z > 0 && vertex_2.z > 0)
+		{
+			auto v_1 = Vector2(vertex_1.x / vertex_1.z, vertex_1.y / vertex_1.z);
+			auto v_2 = Vector2(vertex_2.x / vertex_2.z, vertex_2.y / vertex_2.z);
+
+			v_1 = v_1 * scaler + translator;
+			v_2 = v_2 * scaler + translator;
+
+			SDL_RenderDrawLine(gRenderer, (int)v_2.x, (int)v_2.y, (int)v_1.x, (int)v_1.y);
+		}
+	}
 }
