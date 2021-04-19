@@ -143,15 +143,17 @@ int main(int argc, char *args[])
 				{
 					int xpos = e.motion.xrel;
 					int ypos = e.motion.yrel;
+					// The rotation axis is the vector orthogonal to (xpos, ypos, 0) and e_3.
 					// Source for this calculation https://math.stackexchange.com/questions/142821/matrix-for-rotation-around-a-vector
-					if (xpos != 0 && ypos != 0)
+					if (xpos != 0 || ypos != 0)
 					{
-						auto axis = LinAlg::normalize(Vector3{ypos, xpos, 0});
-						axis.print();
+						auto rotation_angle = M_PI / 100;
+						auto input = LinAlg::normalize(Vector3{xpos, ypos, 0});
+						auto axis = LinAlg::normalize(LinAlg::cross(Vector3{0, 0, 1}, input));
 						auto W = Matrix3{{{0, -axis.z, axis.y},
 										  {axis.z, 0, -axis.x},
 										  {-axis.y, axis.x, 0}}};
-						auto rotation = IDENTITY_MATRIX + W * (sin(M_PI / 40)) + (W * W) * (2 * pow(sin(M_PI / 80), 2));
+						auto rotation = IDENTITY_MATRIX + W * (sin(rotation_angle)) + (W * W) * (2 * pow(sin(rotation_angle / 2), 2));
 						current_basis.rotate(rotation);
 					}
 					break;

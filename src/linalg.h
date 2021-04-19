@@ -66,6 +66,7 @@ namespace LinAlg
 
 	double dot(Vector3 v, Vector3 w);
 	double distance(Vector3 v, Vector3 w);
+	Vector3 cross(Vector3 v, Vector3 w);
 	Vector3 normalize(Vector3 v);
 
 	typedef struct Matrix3

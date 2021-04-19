@@ -74,6 +74,15 @@ namespace LinAlg
 
 	double distance(Vector3 v, Vector3 w) { return sqrt(dot(v - w, v - w)); }
 
+	Vector3 cross(Vector3 v, Vector3 w)
+	{
+		Vector3 result;
+		result.x = v.y * w.z - v.z * w.y;
+		result.y = v.z * w.x - v.x * w.z;
+		result.z = v.x * w.y - v.y * w.x;
+		return result;
+	}
+
 	Vector3 normalize(Vector3 v)
 	{
 		double norm = distance(v, ZERO_VECTOR_3D);
@@ -213,8 +222,10 @@ namespace LinAlg
 
 	void Basis::print()
 	{
+		printf("{\n");
 		v_1.print();
 		v_2.print();
 		v_3.print();
+		printf("}\n");
 	}
 } // namespace LinAlg
