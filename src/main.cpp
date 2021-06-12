@@ -19,7 +19,6 @@ const int BLOCK_HEIGHT = 16;
 auto camera = Vector3(-2, -2, -2);
 auto current_basis = LinAlg::Basis{Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1)};
 
-// TODO: Move everything to 3D, render planets as spheres
 // TODO: Allow camera rotation. Start by allowing 90 degree rotations
 // TODO: User can pause the simulation and enter commands into the terminal to add/remove planets and then resume.
 // TODO: The result of the simulation seems to be tied to the window's height and width; figure out why and fix it.
@@ -32,7 +31,8 @@ void draw_body(Universe::CelestialBody &body);
 std::vector<Universe::CelestialBody> create_solar_system();
 void render_mesh(std::vector<std::pair<Vector3, Vector3>> edges, int scaler, Vector2 translator);
 void draw_cube();
-void draw_sphere(int N, int M);
+void draw_sphere(int N, int M, Vector3 position);
+Vector3 sphere_sample_point(int n, int m, int N, int M, Vector3 position);
 
 SDL_Window *gWindow = NULL;
 SDL_Renderer *gRenderer = NULL;
@@ -141,6 +141,7 @@ int main(int argc, char *args[])
 					break;
 				case SDL_MOUSEMOTION:
 				{
+					// TODO: FIX THE CAMERA, it does not work well at all.
 					int xpos = e.motion.xrel;
 					int ypos = e.motion.yrel;
 					// The rotation axis is the vector orthogonal to (xpos, ypos, 0) and e_3.
@@ -149,7 +150,7 @@ int main(int argc, char *args[])
 					{
 						auto rotation_angle = M_PI / 100;
 						auto input = LinAlg::normalize(Vector3{xpos, ypos, 0});
-						auto axis = LinAlg::normalize(LinAlg::cross(Vector3{0, 0, 1}, input));
+						auto axis = LinAlg::cross(Vector3{0, 0, 1}, input);
 						auto W = Matrix3{{{0, -axis.z, axis.y},
 										  {axis.z, 0, -axis.x},
 										  {-axis.y, axis.x, 0}}};
@@ -163,11 +164,9 @@ int main(int argc, char *args[])
 				}
 			}
 
-			// Universe::update_system(solar_system, delta_t);
-			// draw_system(solar_system);
+			Universe::update_system(solar_system, delta_t);
+			draw_system(solar_system);
 
-			// draw_cube();
-			draw_sphere(20, 20);
 			SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0);
 			SDL_UpdateWindowSurface(gWindow);
 		}
@@ -227,12 +226,7 @@ void draw_system(std::vector<Universe::CelestialBody> &solar_system)
 
 void draw_body(Universe::CelestialBody &body)
 {
-	auto x = (int)floor(body.position.x);
-	auto y = (int)floor(body.position.y);
-
-	SDL_Rect rect = {x, y, BLOCK_WIDTH, BLOCK_HEIGHT};
-	SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 0);
-	SDL_RenderFillRect(gRenderer, &rect);
+	draw_sphere(20, 20, body.position);
 }
 
 std::vector<Universe::CelestialBody> create_solar_system()
@@ -240,21 +234,21 @@ std::vector<Universe::CelestialBody> create_solar_system()
 	std::vector<Universe::CelestialBody> solar_system;
 	Universe::CelestialBody planet_one = Universe::CelestialBody(
 		1000000,
-		Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2),
-		ZERO_VECTOR,
-		ZERO_VECTOR);
+		Vector3(0, 0, 0),
+		ZERO_VECTOR_3D,
+		ZERO_VECTOR_3D);
 
 	Universe::CelestialBody planet_two = Universe::CelestialBody(
 		10,
-		Vector2(WINDOW_WIDTH / 3 * 2, WINDOW_HEIGHT / 2),
-		Vector2(0, -20),
-		ZERO_VECTOR);
+		Vector3(10, 0, 0),
+		Vector3(0, -2, 0),
+		ZERO_VECTOR_3D);
 
 	Universe::CelestialBody planet_three = Universe::CelestialBody(
 		10,
-		Vector2(WINDOW_WIDTH / 8 * 7, WINDOW_HEIGHT / 2),
-		Vector2(0, 12),
-		ZERO_VECTOR);
+		Vector3(20, 0, 0),
+		Vector3(0, 1, 0),
+		ZERO_VECTOR_3D);
 
 	solar_system.push_back(planet_one);
 	solar_system.push_back(planet_two);
@@ -292,13 +286,8 @@ void draw_cube()
 	render_mesh(mesh, 200, Vector2(400, 400));
 }
 
-Vector3 sphere_sample_point(int n, int m, int N, int M)
-{
-	return Vector3(sin(M_PI * m / M) * cos(2 * M_PI * n / N), sin(M_PI * m / M) * sin(2 * M_PI * n / N), cos(M_PI * m / M));
-}
-
-// edges correspond to every pair ((m, n), (m', n')) where |m - m'| = 1 xor |n - n'|
-void draw_sphere(int N, int M)
+// edges correspond to every pair ((m, n), (m', n')) where |m - m'| = 1 xor |n - n'| = 1
+void draw_sphere(int N, int M, Vector3 position)
 {
 	std::vector<std::pair<Vector3, Vector3>> mesh;
 	// This mesh is insanely inefficient, a lot (and I do mean A LOT) of edges will be pushed back twice, but w/e.
@@ -306,33 +295,38 @@ void draw_sphere(int N, int M)
 	{
 		for (int n = 0; n <= N; n++)
 		{
-			auto v_1 = sphere_sample_point(n, m, N, M);
+			auto v_1 = sphere_sample_point(n, m, N, M, position);
 			if (n < N)
 			{
-				auto v_2 = sphere_sample_point(n + 1, m, N, M);
+				auto v_2 = sphere_sample_point(n + 1, m, N, M, position);
 				mesh.push_back(std::make_pair(v_1, v_2));
 			}
 			if (n > 0)
 			{
-				auto v_2 = sphere_sample_point(n - 1, m, N, M);
+				auto v_2 = sphere_sample_point(n - 1, m, N, M, position);
 				mesh.push_back(std::make_pair(v_1, v_2));
 			}
 
 			if (m < M)
 			{
-				auto v_2 = sphere_sample_point(n, m + 1, N, M);
+				auto v_2 = sphere_sample_point(n, m + 1, N, M, position);
 				mesh.push_back(std::make_pair(v_1, v_2));
 			}
 
 			if (m > 0)
 			{
-				auto v_2 = sphere_sample_point(n, m - 1, N, M);
+				auto v_2 = sphere_sample_point(n, m - 1, N, M, position);
 				mesh.push_back(std::make_pair(v_1, v_2));
 			}
 		}
 	}
 
 	render_mesh(mesh, 200, Vector2(400, 400));
+}
+
+Vector3 sphere_sample_point(int n, int m, int N, int M, Vector3 position)
+{
+	return Vector3(sin(M_PI * m / M) * cos(2 * M_PI * n / N), sin(M_PI * m / M) * sin(2 * M_PI * n / N), cos(M_PI * m / M)) + position;
 }
 
 void render_mesh(std::vector<std::pair<Vector3, Vector3>> edges, int scaler, Vector2 translator)

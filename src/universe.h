@@ -5,7 +5,7 @@
 
 #include "linalg.h"
 
-using LinAlg::Vector2;
+using LinAlg::Vector3;
 
 extern const double G;
 
@@ -15,19 +15,19 @@ namespace Universe
 	{
 		int id;
 		double mass;
-		Vector2 position;
-		Vector2 velocity;
-		Vector2 acceleration;
+		Vector3 position;
+		Vector3 velocity;
+		Vector3 acceleration;
 
 		void update_position(const double delta_t);
 		void update_velocity(const double delta_t);
-		Vector2 gravitational_force(CelestialBody &other);
+		Vector3 gravitational_force(CelestialBody &other);
 		void update_acceleration(std::vector<CelestialBody> &solar_system);
 		// TODO: Get rid of constructors in general?
 		CelestialBody()
 		{
 		}
-		CelestialBody(double _mass, Vector2 _position, Vector2 _velocity, Vector2 _acceleration) : mass(_mass), position(_position), velocity(_velocity), acceleration(_acceleration)
+		CelestialBody(double _mass, Vector3 _position, Vector3 _velocity, Vector3 _acceleration) : mass(_mass), position(_position), velocity(_velocity), acceleration(_acceleration)
 		{
 			static int system_id_counter = 0;
 			this->id = system_id_counter++;
