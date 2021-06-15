@@ -13,13 +13,10 @@ using LinAlg::Vector3;
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
-const int BLOCK_WIDTH = 16;
-const int BLOCK_HEIGHT = 16;
 
 auto camera = Vector3(-2, -2, -2);
 auto current_basis = LinAlg::Basis{Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1)};
 
-// TODO: Allow camera rotation. Start by allowing 90 degree rotations
 // TODO: User can pause the simulation and enter commands into the terminal to add/remove planets and then resume.
 // TODO: The result of the simulation seems to be tied to the window's height and width; figure out why and fix it.
 // TODO: Replace std::vector with a custom bump allocator to allocate at most 1_000 planets or something.
@@ -30,7 +27,6 @@ void draw_system(std::vector<Universe::CelestialBody> &solar_system);
 void draw_body(Universe::CelestialBody &body);
 std::vector<Universe::CelestialBody> create_solar_system();
 void render_mesh(std::vector<std::pair<Vector3, Vector3>> edges, int scaler, Vector2 translator);
-void draw_cube();
 void draw_sphere(int N, int M, Vector3 position);
 Vector3 sphere_sample_point(int n, int m, int N, int M, Vector3 position);
 
@@ -70,39 +66,39 @@ int main(int argc, char *args[])
 					switch (e.key.keysym.sym)
 					{
 					case SDLK_LEFT:
-						camera += Vector3(-0.05, 0., 0.);
+						camera += Vector3(-0.1, 0., 0.);
 						break;
 					case SDLK_RIGHT:
-						camera += Vector3(0.05, 0., 0.);
+						camera += Vector3(0.1, 0., 0.);
 						break;
 					case SDLK_UP:
-						camera += Vector3(0., 0.05, 0.);
+						camera += Vector3(0., 0.1, 0.);
 						break;
 					case SDLK_DOWN:
-						camera += Vector3(0., -0.05, 0.);
+						camera += Vector3(0., -0.1, 0.);
 						break;
 					case SDLK_w:
 					{
 						auto direction = current_basis.v_3;
-						camera += direction * 0.05;
+						camera += direction * 0.1;
 						break;
 					}
 					case SDLK_s:
 					{
 						auto direction = current_basis.v_3;
-						camera += direction * (-0.05);
+						camera += direction * (-0.1);
 						break;
 					}
 					case SDLK_a:
 					{
 						auto direction = current_basis.v_1;
-						camera += direction * (-0.05);
+						camera += direction * (-0.1);
 						break;
 					}
 					case SDLK_d:
 					{
 						auto direction = current_basis.v_1;
-						camera += direction * 0.05;
+						camera += direction * 0.1;
 						break;
 					}
 					case SDLK_r:
@@ -257,35 +253,6 @@ std::vector<Universe::CelestialBody> create_solar_system()
 	return solar_system;
 }
 
-void draw_cube()
-{
-
-	auto A = Vector3(1, 1, 1);
-	auto B = Vector3(-1, 1, 1);
-	auto C = Vector3(1, -1, 1);
-	auto D = Vector3(-1, -1, 1);
-	auto E = Vector3(1, 1, -1);
-	auto F = Vector3(-1, 1, -1);
-	auto G = Vector3(1, -1, -1);
-	auto H = Vector3(-1, -1, -1);
-
-	std::vector<std::pair<Vector3, Vector3>> mesh;
-	mesh.push_back(std::make_pair(A, B));
-	mesh.push_back(std::make_pair(C, D));
-	mesh.push_back(std::make_pair(E, F));
-	mesh.push_back(std::make_pair(G, H));
-	mesh.push_back(std::make_pair(A, C));
-	mesh.push_back(std::make_pair(B, D));
-	mesh.push_back(std::make_pair(E, G));
-	mesh.push_back(std::make_pair(F, H));
-	mesh.push_back(std::make_pair(A, E));
-	mesh.push_back(std::make_pair(C, G));
-	mesh.push_back(std::make_pair(B, F));
-	mesh.push_back(std::make_pair(D, H));
-
-	render_mesh(mesh, 200, Vector2(400, 400));
-}
-
 // edges correspond to every pair ((m, n), (m', n')) where |m - m'| = 1 xor |n - n'| = 1
 void draw_sphere(int N, int M, Vector3 position)
 {
@@ -321,7 +288,7 @@ void draw_sphere(int N, int M, Vector3 position)
 		}
 	}
 
-	render_mesh(mesh, 200, Vector2(400, 400));
+	render_mesh(mesh, 200, Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2));
 }
 
 Vector3 sphere_sample_point(int n, int m, int N, int M, Vector3 position)
