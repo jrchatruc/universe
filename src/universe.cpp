@@ -1,15 +1,13 @@
-#include "universe.h"
-
 #include <math.h>
 #include <stdio.h>
-
 #include <vector>
 
+#include "universe.h"
 #include "linalg.h"
 
-using LinAlg::Vector2;
+using LinAlg::Vector3;
 
-const double G = 0.05;
+const double G = 0.00005;
 
 namespace Universe
 {
@@ -23,7 +21,7 @@ namespace Universe
 		this->velocity += acceleration * delta_t;
 	}
 
-	Vector2 CelestialBody::gravitational_force(CelestialBody &other)
+	Vector3 CelestialBody::gravitational_force(CelestialBody &other)
 	{
 		auto r = LinAlg::distance(position, other.position);
 		auto force = (mass * other.mass * G) / pow(r, 2);
@@ -34,7 +32,7 @@ namespace Universe
 	void CelestialBody::update_acceleration(
 		std::vector<CelestialBody> &solar_system)
 	{
-		auto acceleration = ZERO_VECTOR;
+		auto acceleration = ZERO_VECTOR_3D;
 		for (auto &other_body : solar_system)
 		{
 			if (other_body.id != id)
@@ -63,9 +61,9 @@ namespace Universe
 	void print_body(CelestialBody body)
 	{
 		printf(
-			"Id: %i\nMass: %f\nPosition: (%f, %f)\nVelocity: (%f, %f)\nAcceleration: "
-			"(%f, %f)\n",
-			body.id, body.mass, body.position.x, body.position.y, body.velocity.x,
-			body.velocity.y, body.acceleration.x, body.acceleration.y);
+			"Id: %i\nMass: %f\nPosition: (%f, %f, %f)\nVelocity: (%f, %f, %f)\nAcceleration: "
+			"(%f, %f, %f)\n",
+			body.id, body.mass, body.position.x, body.position.y, body.position.z, body.velocity.x,
+			body.velocity.y, body.velocity.z, body.acceleration.x, body.acceleration.y, body.acceleration.z);
 	}
 } // namespace Universe
