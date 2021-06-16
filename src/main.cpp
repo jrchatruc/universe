@@ -137,16 +137,15 @@ int main(int argc, char *args[])
 					break;
 				case SDL_MOUSEMOTION:
 				{
-					// TODO: FIX THE CAMERA, it does not work well at all.
 					int xpos = e.motion.xrel;
 					int ypos = e.motion.yrel;
-					// The rotation axis is the vector orthogonal to (xpos, ypos, 0) and e_3.
+					// The rotation axis is the vector orthogonal to (xpos, ypos, 0) (in current_basis coordinates) and current_basis.v_3.
 					// Source for this calculation https://math.stackexchange.com/questions/142821/matrix-for-rotation-around-a-vector
 					if (xpos != 0 || ypos != 0)
 					{
 						auto rotation_angle = M_PI / 100;
 						auto input = LinAlg::normalize(Vector3{xpos, ypos, 0});
-						auto axis = LinAlg::cross(Vector3{0, 0, 1}, input);
+						auto axis = LinAlg::cross(current_basis.v_3, current_basis.v_1 * input.x + current_basis.v_2 * input.y);
 						auto W = Matrix3{{{0, -axis.z, axis.y},
 										  {axis.z, 0, -axis.x},
 										  {-axis.y, axis.x, 0}}};
