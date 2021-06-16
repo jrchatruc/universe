@@ -17,6 +17,7 @@ const int WINDOW_HEIGHT = 800;
 auto camera = Vector3(-2, -2, -2);
 auto current_basis = LinAlg::Basis{Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1)};
 
+// TODO: Add a ground or something to have as reference, I can't tell if there's something wrong with the camera or not.
 // TODO: User can pause the simulation and enter commands into the terminal to add/remove planets and then resume.
 // TODO: The result of the simulation seems to be tied to the window's height and width; figure out why and fix it.
 // TODO: Replace std::vector with a custom bump allocator to allocate at most 1_000 planets or something.
@@ -92,14 +93,14 @@ int main(int argc, char *args[])
 					}
 					case SDLK_q:
 					{
-						// barrel roll
+						// "forward" as the axis of rotation
 						auto rotation = get_rotation_matrix(current_basis.v_3 * (-1), M_PI / 100);
 						current_basis.rotate(rotation);
 						break;
 					}
 					case SDLK_e:
 					{
-						// barrel roll, opposite direction
+						// "forward" as the axis of rotation, opposite direction
 						auto rotation = get_rotation_matrix(current_basis.v_3, M_PI / 100);
 						current_basis.rotate(rotation);
 						break;
