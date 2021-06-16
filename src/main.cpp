@@ -29,6 +29,7 @@ std::vector<Universe::CelestialBody> create_solar_system();
 void render_mesh(std::vector<std::pair<Vector3, Vector3>> edges, int scaler, Vector2 translator);
 void draw_sphere(int N, int M, Vector3 position);
 Vector3 sphere_sample_point(int n, int m, int N, int M, Vector3 position);
+Matrix3 get_rotation_matrix(Vector3 axis, double angle);
 
 SDL_Window *gWindow = NULL;
 SDL_Renderer *gRenderer = NULL;
@@ -65,18 +66,6 @@ int main(int argc, char *args[])
 				case SDL_KEYDOWN:
 					switch (e.key.keysym.sym)
 					{
-					case SDLK_LEFT:
-						camera += Vector3(-0.1, 0., 0.);
-						break;
-					case SDLK_RIGHT:
-						camera += Vector3(0.1, 0., 0.);
-						break;
-					case SDLK_UP:
-						camera += Vector3(0., 0.1, 0.);
-						break;
-					case SDLK_DOWN:
-						camera += Vector3(0., -0.1, 0.);
-						break;
 					case SDLK_w:
 					{
 						auto direction = current_basis.v_3;
@@ -101,33 +90,17 @@ int main(int argc, char *args[])
 						camera += direction * 0.1;
 						break;
 					}
-					case SDLK_r:
+					case SDLK_q:
 					{
-						// X as rotation axis
-						Matrix3 rotation = Matrix3{
-							{{1, 0, 0},
-							 {0, cos(M_PI / 40), -sin(M_PI / 40)},
-							 {0, sin(M_PI / 40), cos(M_PI / 40)}}};
+						// barrel roll
+						auto rotation = get_rotation_matrix(current_basis.v_3 * (-1), M_PI / 100);
 						current_basis.rotate(rotation);
 						break;
 					}
-					case SDLK_t:
+					case SDLK_e:
 					{
-						// Y as rotation axis
-						Matrix3 rotation = Matrix3{
-							{{cos(M_PI / 40), 0, -sin(M_PI / 40)},
-							 {0, 1, 0},
-							 {sin(M_PI / 40), 0, cos(M_PI / 40)}}};
-						current_basis.rotate(rotation);
-						break;
-					}
-					case SDLK_y:
-					{
-						// Z as rotation axis
-						Matrix3 rotation = Matrix3{
-							{{cos(M_PI / 40), -sin(M_PI / 40), 0},
-							 {sin(M_PI / 40), cos(M_PI / 40), 0},
-							 {0, 0, 1}}};
+						// barrel roll, opposite direction
+						auto rotation = get_rotation_matrix(current_basis.v_3, M_PI / 100);
 						current_basis.rotate(rotation);
 						break;
 					}
@@ -140,16 +113,12 @@ int main(int argc, char *args[])
 					int xpos = e.motion.xrel;
 					int ypos = e.motion.yrel;
 					// The rotation axis is the vector orthogonal to (xpos, ypos, 0) (in current_basis coordinates) and current_basis.v_3.
-					// Source for this calculation https://math.stackexchange.com/questions/142821/matrix-for-rotation-around-a-vector
 					if (xpos != 0 || ypos != 0)
 					{
 						auto rotation_angle = M_PI / 100;
 						auto input = LinAlg::normalize(Vector3{xpos, ypos, 0});
 						auto axis = LinAlg::cross(current_basis.v_3, current_basis.v_1 * input.x + current_basis.v_2 * input.y);
-						auto W = Matrix3{{{0, -axis.z, axis.y},
-										  {axis.z, 0, -axis.x},
-										  {-axis.y, axis.x, 0}}};
-						auto rotation = IDENTITY_MATRIX + W * (sin(rotation_angle)) + (W * W) * (2 * pow(sin(rotation_angle / 2), 2));
+						auto rotation = get_rotation_matrix(axis, rotation_angle);
 						current_basis.rotate(rotation);
 					}
 					break;
@@ -315,4 +284,13 @@ void render_mesh(std::vector<std::pair<Vector3, Vector3>> edges, int scaler, Vec
 			SDL_RenderDrawLine(gRenderer, (int)v_2.x, (int)v_2.y, (int)v_1.x, (int)v_1.y);
 		}
 	}
+}
+
+// Source for this calculation https://math.stackexchange.com/questions/142821/matrix-for-rotation-around-a-vector
+Matrix3 get_rotation_matrix(Vector3 axis, double angle)
+{
+	auto W = Matrix3{{{0, -axis.z, axis.y},
+					  {axis.z, 0, -axis.x},
+					  {-axis.y, axis.x, 0}}};
+	return IDENTITY_MATRIX + W * (sin(angle)) + (W * W) * (2 * pow(sin(angle / 2), 2));
 }
