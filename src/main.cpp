@@ -1,8 +1,7 @@
 #include <SDL2/SDL.h>
 #include <math.h>
 #include <stdio.h>
-
-#include <chrono>
+#include <time.h>
 
 #include "universe.h"
 #include "linalg.h"
@@ -50,15 +49,17 @@ int main(int argc, char *args[])
 		std::vector<Universe::CelestialBody> solar_system = create_solar_system();
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 
-		auto now = std::chrono::system_clock::now();
+		struct timespec now, new_now;
+		double delta_t;
+		clock_gettime(CLOCK_MONOTONIC, &now);
 		while (!quit)
 		{
 			SDL_RenderClear(gRenderer);
-			auto new_now = std::chrono::system_clock::now();
-			double delta_t =
-				(std::chrono::duration_cast<
-					 std::chrono::duration<float>>(new_now - now))
-					.count();
+
+			clock_gettime(CLOCK_MONOTONIC, &new_now);
+			delta_t = (new_now.tv_sec - now.tv_sec);
+			delta_t += (new_now.tv_nsec - now.tv_nsec) / 1000000000.0;
+
 			now = new_now;
 			while (SDL_PollEvent(&e))
 			{
