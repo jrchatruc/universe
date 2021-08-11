@@ -66,4 +66,32 @@ namespace Universe
 			body.id, body.mass, body.position.x, body.position.y, body.position.z, body.velocity.x,
 			body.velocity.y, body.velocity.z, body.acceleration.x, body.acceleration.y, body.acceleration.z);
 	}
+
+	std::vector<Universe::CelestialBody> create_solar_system()
+	{
+		std::vector<Universe::CelestialBody> solar_system;
+		Universe::CelestialBody planet_one = Universe::CelestialBody(
+			1000000,
+			Vector3(0, 0, 0),
+			ZERO_VECTOR_3D,
+			ZERO_VECTOR_3D);
+
+		Universe::CelestialBody planet_two = Universe::CelestialBody(
+			10,
+			Vector3(10, 0, 0),
+			Vector3(0, -2, 0),
+			ZERO_VECTOR_3D);
+
+		Universe::CelestialBody planet_three = Universe::CelestialBody(
+			10,
+			Vector3(20, 0, 0),
+			Vector3(0, 1, 0),
+			ZERO_VECTOR_3D);
+
+		solar_system.push_back(planet_one);
+		solar_system.push_back(planet_two);
+		solar_system.push_back(planet_three);
+
+		return solar_system;
+	}
 } // namespace Universe

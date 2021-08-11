@@ -87,8 +87,11 @@ namespace LinAlg
 		Vector3 v_2;
 		Vector3 v_3;
 		void rotate(Matrix3 matrix);
+		void rotate(Vector3 axis, double rotation_angle);
 		Vector3 coordinates(Vector3 vector);
 		void print();
 	} Basis;
+
+	static Matrix3 get_rotation_matrix(Vector3 axis, double angle);
 } // namespace LinAlg
 #endif

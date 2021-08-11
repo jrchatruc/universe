@@ -34,6 +34,7 @@ namespace Universe
 		}
 	} CelestialBody;
 
+	std::vector<Universe::CelestialBody> create_solar_system();
 	void update_system(std::vector<CelestialBody> &solar_system, double delta_t);
 	void print_body(CelestialBody body);
 } // namespace Universe

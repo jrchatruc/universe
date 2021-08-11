@@ -211,6 +211,13 @@ namespace LinAlg
 		this->v_3 = matrix * v_3;
 	}
 
+	// Same comment as above
+	void Basis::rotate(Vector3 axis, double rotation_angle)
+	{
+		auto rotation = get_rotation_matrix(axis, rotation_angle);
+		this->rotate(rotation);
+	}
+
 	Vector3 Basis::coordinates(Vector3 vector)
 	{
 		Vector3 result;
@@ -227,5 +234,14 @@ namespace LinAlg
 		v_2.print();
 		v_3.print();
 		printf("}\n");
+	}
+
+	// Source for this calculation https://math.stackexchange.com/questions/142821/matrix-for-rotation-around-a-vector
+	static Matrix3 get_rotation_matrix(Vector3 axis, double angle)
+	{
+		auto W = Matrix3{{{0, -axis.z, axis.y},
+						  {axis.z, 0, -axis.x},
+						  {-axis.y, axis.x, 0}}};
+		return IDENTITY_MATRIX + W * (sin(angle)) + (W * W) * (2 * pow(sin(angle / 2), 2));
 	}
 } // namespace LinAlg
