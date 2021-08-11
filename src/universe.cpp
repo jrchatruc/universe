@@ -11,6 +11,19 @@ const double G = 0.00005;
 
 namespace Universe
 {
+	CelestialBody create_body(double mass, Vector3 position, Vector3 velocity, Vector3 acceleration)
+	{
+		static int system_id_counter = 0;
+		auto id = system_id_counter++;
+
+		return CelestialBody{
+			.id = id,
+			.mass = mass,
+			.position = position,
+			.velocity = velocity,
+			.acceleration = acceleration};
+	}
+
 	void CelestialBody::update_position(const double delta_t)
 	{
 		this->position += velocity * delta_t;
@@ -70,22 +83,22 @@ namespace Universe
 	std::vector<Universe::CelestialBody> create_solar_system()
 	{
 		std::vector<Universe::CelestialBody> solar_system;
-		Universe::CelestialBody planet_one = Universe::CelestialBody(
+		auto planet_one = create_body(
 			1000000,
-			Vector3(0, 0, 0),
+			Vector3{0., 0., 0.},
 			ZERO_VECTOR_3D,
 			ZERO_VECTOR_3D);
 
-		Universe::CelestialBody planet_two = Universe::CelestialBody(
+		auto planet_two = create_body(
 			10,
-			Vector3(10, 0, 0),
-			Vector3(0, -2, 0),
+			Vector3{10., 0., 0.},
+			Vector3{0., -2., 0.},
 			ZERO_VECTOR_3D);
 
-		Universe::CelestialBody planet_three = Universe::CelestialBody(
+		auto planet_three = create_body(
 			10,
-			Vector3(20, 0, 0),
-			Vector3(0, 1, 0),
+			Vector3{20., 0, 0.},
+			Vector3{0., 1., 0.},
 			ZERO_VECTOR_3D);
 
 		solar_system.push_back(planet_one);

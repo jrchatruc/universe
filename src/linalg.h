@@ -1,10 +1,10 @@
 #ifndef __LINALG__H_
 #define __LINALG__H_
 
-#define ZERO_VECTOR (Vector2(0, 0))
-#define ZERO_VECTOR_3D (Vector3(0, 0, 0))
+#define ZERO_VECTOR (Vector2{0., 0.})
+#define ZERO_VECTOR_3D (Vector3{0., 0., 0.})
 #define IDENTITY_MATRIX \
-	(Matrix3{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}})
+	(Matrix3{{{1., 0., 0.}, {0., 1., 0.}, {0., 0., 1.}}})
 
 namespace LinAlg
 {
@@ -17,19 +17,6 @@ namespace LinAlg
 		Vector2 operator-(Vector2 &other);
 		Vector2 operator*(double scalar);
 		Vector2 operator/(double scalar);
-		Vector2()
-		{
-		}
-		Vector2(double x_, double y_)
-		{
-			x = x_;
-			y = y_;
-		}
-		Vector2(int x_, int y_)
-		{
-			x = (double)x_;
-			y = (double)y_;
-		}
 	} Vector2;
 
 	double dot(Vector2 v, Vector2 w);
@@ -47,21 +34,6 @@ namespace LinAlg
 		Vector3 operator*(double scalar);
 		Vector3 operator/(double scalar);
 		void print();
-		Vector3()
-		{
-		}
-		Vector3(double x_, double y_, double z_)
-		{
-			x = x_;
-			y = y_;
-			z = z_;
-		}
-		Vector3(int x_, int y_, int z_)
-		{
-			x = (double)x_;
-			y = (double)y_;
-			z = (double)z_;
-		}
 	} Vector3;
 
 	double dot(Vector3 v, Vector3 w);

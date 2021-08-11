@@ -10,8 +10,8 @@ SDL_Window *gWindow = NULL;
 SDL_Renderer *gRenderer = NULL;
 SDL_Surface *gScreenSurface = NULL;
 
-Vector3 camera = Vector3(-2, -2, -2);
-LinAlg::Basis current_camera_basis = LinAlg::Basis{Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1)};
+Vector3 camera = Vector3{-2, -2, -2};
+LinAlg::Basis current_camera_basis = LinAlg::Basis{Vector3{1, 0, 0}, Vector3{0, 1, 0}, Vector3{0, 0, 1}};
 
 namespace Renderer
 {
@@ -119,12 +119,12 @@ namespace Renderer
             }
         }
 
-        render_mesh(mesh, 200, Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2));
+        render_mesh(mesh, 200, Vector2{WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2});
     }
 
     static Vector3 sphere_sample_point(int n, int m, int N, int M, Vector3 position)
     {
-        return Vector3(sin(M_PI * m / M) * cos(2 * M_PI * n / N), sin(M_PI * m / M) * sin(2 * M_PI * n / N), cos(M_PI * m / M)) + position;
+        return Vector3{sin(M_PI * m / M) * cos(2 * M_PI * n / N), sin(M_PI * m / M) * sin(2 * M_PI * n / N), cos(M_PI * m / M)} + position;
     }
 
     static void render_mesh(std::vector<std::pair<Vector3, Vector3>> edges, int scaler, Vector2 translator)
@@ -138,8 +138,8 @@ namespace Renderer
             // Only render edge if it's in front of the camera
             if (vertex_1.z > 0 && vertex_2.z > 0)
             {
-                auto v_1 = Vector2(vertex_1.x / vertex_1.z, vertex_1.y / vertex_1.z);
-                auto v_2 = Vector2(vertex_2.x / vertex_2.z, vertex_2.y / vertex_2.z);
+                auto v_1 = Vector2{vertex_1.x / vertex_1.z, vertex_1.y / vertex_1.z};
+                auto v_2 = Vector2{vertex_2.x / vertex_2.z, vertex_2.y / vertex_2.z};
 
                 v_1 = v_1 * scaler + translator;
                 v_2 = v_2 * scaler + translator;

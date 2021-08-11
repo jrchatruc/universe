@@ -23,16 +23,9 @@ namespace Universe
 		void update_velocity(const double delta_t);
 		Vector3 gravitational_force(CelestialBody &other);
 		void update_acceleration(std::vector<CelestialBody> &solar_system);
-		// TODO: Get rid of constructors in general?
-		CelestialBody()
-		{
-		}
-		CelestialBody(double _mass, Vector3 _position, Vector3 _velocity, Vector3 _acceleration) : mass(_mass), position(_position), velocity(_velocity), acceleration(_acceleration)
-		{
-			static int system_id_counter = 0;
-			this->id = system_id_counter++;
-		}
 	} CelestialBody;
+
+	CelestialBody create_body(double mass, Vector3 position, Vector3 velocity, Vector3 acceleration);
 
 	std::vector<Universe::CelestialBody> create_solar_system();
 	void update_system(std::vector<CelestialBody> &solar_system, double delta_t);

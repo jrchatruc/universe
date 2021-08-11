@@ -7,7 +7,7 @@ namespace LinAlg
 {
 	Vector2 Vector2::operator+(Vector2 other)
 	{
-		return Vector2(x + other.x, y + other.y);
+		return Vector2{.x = x + other.x, .y = y + other.y};
 	}
 
 	Vector2 &Vector2::operator+=(const Vector2 &rhs)
@@ -19,17 +19,17 @@ namespace LinAlg
 
 	Vector2 Vector2::operator-(Vector2 &other)
 	{
-		return Vector2(x - other.x, y - other.y);
+		return Vector2{x - other.x, y - other.y};
 	}
 
 	Vector2 Vector2::operator*(double scalar)
 	{
-		return Vector2(x * scalar, y * scalar);
+		return Vector2{x * scalar, y * scalar};
 	}
 
 	Vector2 Vector2::operator/(double scalar)
 	{
-		return Vector2(x / scalar, y / scalar);
+		return Vector2{x / scalar, y / scalar};
 	}
 
 	double dot(Vector2 v, Vector2 w) { return v.x * w.x + v.y * w.y; }
@@ -44,7 +44,7 @@ namespace LinAlg
 
 	Vector3 Vector3::operator+(Vector3 other)
 	{
-		return Vector3(x + other.x, y + other.y, z + other.z);
+		return Vector3{x + other.x, y + other.y, z + other.z};
 	}
 
 	Vector3 &Vector3::operator+=(const Vector3 &rhs)
@@ -57,17 +57,17 @@ namespace LinAlg
 
 	Vector3 Vector3::operator-(Vector3 &other)
 	{
-		return Vector3(x - other.x, y - other.y, z - other.z);
+		return Vector3{x - other.x, y - other.y, z - other.z};
 	}
 
 	Vector3 Vector3::operator*(double scalar)
 	{
-		return Vector3(x * scalar, y * scalar, z * scalar);
+		return Vector3{x * scalar, y * scalar, z * scalar};
 	}
 
 	Vector3 Vector3::operator/(double scalar)
 	{
-		return Vector3(x / scalar, y / scalar, z / scalar);
+		return Vector3{x / scalar, y / scalar, z / scalar};
 	}
 
 	double dot(Vector3 v, Vector3 w) { return v.x * w.x + v.y * w.y + v.z * w.z; }

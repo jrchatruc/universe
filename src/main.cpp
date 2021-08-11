@@ -96,7 +96,7 @@ int main(int argc, char *args[])
 					if (xpos != 0 || ypos != 0)
 					{
 						auto rotation_angle = M_PI / 100;
-						auto input = LinAlg::normalize(Vector3{xpos, ypos, 0});
+						auto input = LinAlg::normalize(Vector3{(double)xpos, (double)ypos, 0});
 						auto axis = LinAlg::cross(current_camera_basis.v_3, current_camera_basis.v_1 * input.x + current_camera_basis.v_2 * input.y);
 						current_camera_basis.rotate(axis, rotation_angle);
 					}
