@@ -7,7 +7,6 @@
 #include "universe.h"
 #include "linalg.h"
 
-using LinAlg::Vector2;
 using LinAlg::Vector3;
 
 // TODO: Add a ground or something to have as reference, I can't tell if there's something wrong with the camera or not.
