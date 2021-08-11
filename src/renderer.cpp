@@ -148,4 +148,4 @@ namespace Renderer
             }
         }
     }
-}
+} // namespace Renderer
