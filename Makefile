@@ -25,13 +25,11 @@ default: $(TARGET)
 $(TARGET): $(BUILD_DIR)/$(TARGET)
 
 $(BUILD_DIR)/$(TARGET): $(OBJECTS)
-	mkdir -p $(@D)
 	$(CXX) $(CXX_FLAGS) $(LN_FLAGS) $^ -o $@
 
 $(TARGET_RELEASE): $(RLS_DIR)/$(TARGET_RELEASE)
 
 $(RLS_DIR)/$(TARGET_RELEASE): $(RLS_OBJECTS)
-	mkdir -p $(@D)
 	$(CXX) $(CXX_FLAGS) $(RELEASE_FLAGS) $(LN_FLAGS) $^ -o $@
 
 -include $(DEP)
@@ -42,11 +40,11 @@ $(RLS_DIR)/$(TARGET_RELEASE): $(RLS_OBJECTS)
 # The -MMD flags additionaly creates a .d file with
 # the same name as the .o file.
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $(@D)
+	@mkdir -p $(@D)
 	$(CXX) $(CXX_FLAGS) -MMD -c $< -o $@
 
 $(RLS_DIR)/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $(@D)
+	@mkdir -p $(@D)
 	$(CXX) $(CXX_FLAGS) -MMD -c $< -o $@
 
 clean:
