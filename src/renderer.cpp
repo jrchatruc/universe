@@ -15,6 +15,10 @@ LinAlg::Basis current_camera_basis = LinAlg::Basis{Vector3{1, 0, 0}, Vector3{0, 
 
 namespace Renderer
 {
+    static void draw_body(Universe::CelestialBody &body);
+    static void draw_sphere(int N, int M, Vector3 position);
+    static void render_mesh(std::vector<std::pair<Vector3, Vector3>> edges, int scaler, Vector2 translator);
+    static Vector3 sphere_sample_point(int n, int m, int N, int M, Vector3 position);
 
     void close()
     {

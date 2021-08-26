@@ -5,6 +5,8 @@
 
 namespace LinAlg
 {
+	static Matrix3 get_rotation_matrix(Vector3 axis, double angle);
+
 	Vector2 Vector2::operator+(Vector2 other)
 	{
 		return Vector2{.x = x + other.x, .y = y + other.y};

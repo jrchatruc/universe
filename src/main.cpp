@@ -24,7 +24,6 @@ int main(int argc, char *args[])
 	{
 		SDL_Event e;
 		bool quit = false;
-		bool paused = false;
 		std::vector<Universe::CelestialBody> solar_system = Universe::create_solar_system();
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 

@@ -64,6 +64,5 @@ namespace LinAlg
 		void print();
 	} Basis;
 
-	static Matrix3 get_rotation_matrix(Vector3 axis, double angle);
 } // namespace LinAlg
 #endif
