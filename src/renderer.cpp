@@ -1,5 +1,7 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
+#include <SDL_ttf.h>
 #include <math.h>
+#include <stdlib.h>
 
 #include "renderer.h"
 
@@ -9,6 +11,7 @@ const int WINDOW_HEIGHT = 800;
 SDL_Window *gWindow = NULL;
 SDL_Renderer *gRenderer = NULL;
 SDL_Surface *gScreenSurface = NULL;
+TTF_Font *font = NULL;
 
 Vector3 camera = Vector3{-2, -2, -2};
 LinAlg::Basis current_camera_basis = LinAlg::Basis{Vector3{1, 0, 0}, Vector3{0, 1, 0}, Vector3{0, 0, 1}};
@@ -25,6 +28,9 @@ namespace Renderer
         SDL_DestroyWindow(gWindow);
         gWindow = NULL;
 
+        TTF_CloseFont(font);
+        TTF_Quit();
+
         SDL_Quit();
     }
 
@@ -40,6 +46,9 @@ namespace Renderer
         }
         else
         {
+            TTF_Init();
+            font = TTF_OpenFont("font/arial.ttf", 25);
+
             gWindow = SDL_CreateWindow(
                 "Planets", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                 WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
@@ -73,6 +82,24 @@ namespace Renderer
     void move_camera(Vector3 direction)
     {
         camera += direction * 0.1;
+    }
+
+    void render_framerate(double framerate)
+    {
+        char buf[20];
+        gcvt(framerate, 3, buf);
+
+        SDL_Color color = {255, 255, 255};
+        SDL_Surface *surface = TTF_RenderText_Solid(font, buf, color);
+        SDL_Texture *texture = SDL_CreateTextureFromSurface(gRenderer, surface);
+
+        int texW = 0;
+        int texH = 0;
+        SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
+        SDL_Rect dstrect = {0, 0, texW, texH};
+
+        SDL_RenderCopy(gRenderer, texture, NULL, &dstrect);
+        SDL_RenderPresent(gRenderer);
     }
 
     void draw_system(std::vector<Universe::CelestialBody> &solar_system)

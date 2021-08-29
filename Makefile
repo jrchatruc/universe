@@ -4,8 +4,8 @@ TARGET=universe
 TARGET_RELEASE=release
 
 CXX=clang++
-CXX_FLAGS=-std=c++11 -Wall -I/usr/local/include
-LN_FLAGS=-L/usr/local/lib -lSDL2
+CXX_FLAGS=-std=c++11 -Wall $(shell sdl2-config --cflags)
+LN_FLAGS=$(shell sdl2-config --libs) -lSDL2_ttf
 RELEASE_FLAGS=-O3
 
 BUILD_DIR=./build
@@ -45,7 +45,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 $(RLS_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(@D)
-	$(CXX) $(CXX_FLAGS) -MMD -c $< -o $@
+	$(CXX) $(CXX_FLAGS) $(RELEASE_FLAGS) -MMD -c $< -o $@
 
 clean:
 	-rm -rf $(BUILD_DIR)

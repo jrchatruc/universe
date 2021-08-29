@@ -18,5 +18,6 @@ namespace Renderer
 
     void move_camera(Vector3 direction);
     void draw_system(std::vector<Universe::CelestialBody> &solar_system);
+    void render_framerate(double framerate);
 } // namespace Renderer
 #endif

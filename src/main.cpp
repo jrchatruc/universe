@@ -1,4 +1,4 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
@@ -32,6 +32,8 @@ int main(int argc, char *args[])
 		clock_gettime(CLOCK_MONOTONIC, &now);
 		while (!quit)
 		{
+			uint64_t start = SDL_GetPerformanceCounter();
+
 			Renderer::clear_window();
 
 			clock_gettime(CLOCK_MONOTONIC, &new_now);
@@ -107,6 +109,10 @@ int main(int argc, char *args[])
 
 			Universe::update_system(solar_system, delta_t);
 			Renderer::draw_system(solar_system);
+
+			uint64_t end = SDL_GetPerformanceCounter();
+			double elapsed = (end - start) / (double)SDL_GetPerformanceFrequency();
+			Renderer::render_framerate(1. / elapsed);
 
 			Renderer::update_window();
 		}
