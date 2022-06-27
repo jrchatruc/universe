@@ -3,9 +3,9 @@
 TARGET=universe
 TARGET_RELEASE=release
 
-CXX=clang++
+CXX=gcc
 CXX_FLAGS=-std=c++11 -Wall $(shell sdl2-config --cflags)
-LN_FLAGS=$(shell sdl2-config --libs) -lSDL2_ttf
+LN_FLAGS=-lm -lstdc++ $(shell sdl2-config --libs) -lSDL2_ttf
 RELEASE_FLAGS=-O3
 
 BUILD_DIR=./build
